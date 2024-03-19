@@ -26,11 +26,12 @@ This project is built using Java, leveraging the Spring Boot framework for creat
 ### API Endpoints
 
 Still to be added:
-GET - Get iventory item by id
-GET - Get all inventory items
-POST - Create a new inventory item
-PUT - Update inventory item by id
-DELETE - remove inventory item by id
+
+- GET - Get inventory item by id
+- GET - Get all inventory items
+- POST - Create a new inventory item
+- PUT - Update inventory item by id
+- DELETE - Remove inventory item by id
 
 ### Example Request
 
