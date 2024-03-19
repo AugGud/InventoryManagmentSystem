@@ -17,9 +17,20 @@ This project is built using Java, leveraging the Spring Boot framework for creat
 
 ### Steps
 
+1. Clone the repository: https://github.com/AugGud/InventoryManagmentSystem
+2. Navigate to the project directory: cd InventoryManagmentSystem
+3. Run the application using Maven: mvn spring-boot:run
+
 ## Usage
 
 ### API Endpoints
+
+Still to be added:
+GET - Get iventory item by id
+GET - Get all inventory items
+POST - Create a new inventory item
+PUT - Update inventory item by id
+DELETE - remove inventory item by id
 
 ### Example Request
 
