@@ -1,5 +1,6 @@
 package com.auggud.InventoryManagmentSystem;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -7,7 +8,9 @@ import jakarta.persistence.Id;
 @Entity
 class InventoryItem {
 
-  private @Id @GeneratedValue Long id;
+  private @Id @GeneratedValue
+  @JsonIgnore
+  Long id;
   private String name;
   private String description;
   private int quantity;
