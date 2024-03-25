@@ -1,20 +1,34 @@
 package com.auggud.InventoryManagmentSystem;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "inventory_items")
 class InventoryItem {
 
-  private @Id @GeneratedValue
   @JsonIgnore
-  Long id;
-  private String name;
-  private String description;
-  private int quantity;
-  private double amount;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name="inv_item_id")
+    private Long id;
+
+  @Column(name="name")
+    private String name;
+  
+  @Column(name="description")
+    private String description;
+
+  @Column(name="quantity")
+    private int quantity;
+
+  @Column(name="amount")
+    private double amount;
   
   public InventoryItem(String name, String description, int quantity, double amount) {
     this.name = name;
