@@ -21,13 +21,13 @@ public class InventoryItemService {
         return invItemRepository.findAll();
     }
 
-    // READ, in progress.
+//    READ, in progress.
 //    public InventoryItem getInventoryItem(Long invItemId) {
 //        return invItemRepository.findById(invItemId);
 //    }
 
     // DELETE
-    public void deleteIventoryItem(Long invItemId) {
+    public void deleteInventoryItem(Long invItemId) {
         invItemRepository.deleteById(invItemId);
     }
 
