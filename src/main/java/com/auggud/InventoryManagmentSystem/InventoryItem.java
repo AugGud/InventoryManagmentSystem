@@ -1,6 +1,7 @@
 package com.auggud.InventoryManagmentSystem;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +13,6 @@ import jakarta.persistence.Table;
 @Table(name = "inventory_items")
 class InventoryItem {
 
-  @JsonIgnore
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name="inv_item_id")
@@ -28,9 +28,9 @@ class InventoryItem {
     private int quantity;
 
   @Column(name="amount")
-    private double amount;
+    private BigDecimal amount;
   
-  public InventoryItem(String name, String description, int quantity, double amount) {
+  public InventoryItem(String name, String description, int quantity, BigDecimal amount) {
     this.name = name;
     this.description = description;
     this.quantity = quantity;
@@ -72,11 +72,11 @@ class InventoryItem {
     this.quantity = quantity;
   }
 
-  public double getAmount() {
+  public BigDecimal getAmount() {
     return amount;
   }
 
-  public void setAmount(double amount) {
+  public void setAmount(BigDecimal amount) {
     this.amount = amount;
   }
 
@@ -88,9 +88,7 @@ class InventoryItem {
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + ((description == null) ? 0 : description.hashCode());
     result = prime * result + quantity;
-    long temp;
-    temp = Double.doubleToLongBits(amount);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + ((amount == null) ? 0 : amount.hashCode());
     return result;
   }
 
@@ -120,7 +118,10 @@ class InventoryItem {
       return false;
     if (quantity != other.quantity)
       return false;
-    if (Double.doubleToLongBits(amount) != Double.doubleToLongBits(other.amount))
+    if (amount == null) {
+      if (other.amount != null)
+        return false;
+    } else if (!amount.equals(other.amount))
       return false;
     return true;
   }

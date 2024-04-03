@@ -1,8 +1,10 @@
 package com.auggud.InventoryManagmentSystem;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,10 +23,15 @@ public class InventoryItemService {
         return invItemRepository.findAll();
     }
 
-//    READ, in progress.
-//    public InventoryItem getInventoryItem(Long invItemId) {
-//        return invItemRepository.findById(invItemId);
-//    }
+    // READ by id
+    public ResponseEntity<InventoryItem> getById(Long requestedId) {
+        Optional<InventoryItem> invItemOptional = invItemRepository.findById(requestedId);
+        if (invItemOptional.isPresent()) {
+            return ResponseEntity.ok(invItemOptional.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+   }
 
     // DELETE
     public void deleteInventoryItem(Long invItemId) {

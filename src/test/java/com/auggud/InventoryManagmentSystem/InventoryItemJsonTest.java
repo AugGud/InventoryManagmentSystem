@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +18,7 @@ class InventoryItemJsonTest {
 
     @Test
     void inventoryItemSerializationTest() throws IOException {
-        InventoryItem inventoryItem = new InventoryItem("Box", "Cardboard box", 5, 2.0);
+        InventoryItem inventoryItem = new InventoryItem("Box", "Cardboard box", 5, BigDecimal.valueOf(2.0));
 
         assertThat(json.write(inventoryItem)).isStrictlyEqualToJson("expected.json");
 
@@ -49,7 +50,7 @@ class InventoryItemJsonTest {
                 }
                """;
        assertThat(json.parse(expected))
-               .isEqualTo(new InventoryItem("Box", "Cardboard box", 5, 2.0));
+               .isEqualTo(new InventoryItem("Box", "Cardboard box", 5, BigDecimal.valueOf(2.0)));
 
        assertThat(json.parseObject(expected).getName()).isEqualTo("Box");
        assertThat(json.parseObject(expected).getDescription()).isEqualTo("Cardboard box");

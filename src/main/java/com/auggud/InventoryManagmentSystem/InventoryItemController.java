@@ -2,36 +2,47 @@ package com.auggud.InventoryManagmentSystem;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/inventory-items")
 class IventoryItemController {
 
-    @Autowired
-    InventoryItemService invItemService;
+    private final InventoryItemService invItemService;
 
-    @RequestMapping(value="/inventoryitems", method=RequestMethod.POST)
+    public IventoryItemController(InventoryItemService invItemService) {
+        this.invItemService = invItemService;
+    }
+
+    @PostMapping
     public InventoryItem createInventoryItem(@RequestBody InventoryItem invItem) {
     return invItemService.createInventoryItem(invItem);
     }
 
-    @RequestMapping(value="/inventoryitems", method=RequestMethod.GET)
+    @GetMapping("/{requestedId}")
+    public ResponseEntity<InventoryItem> readInventoryItemById(@PathVariable Long requestedId) {
+        return invItemService.getById(requestedId);
+    }
+
+    @GetMapping
     public List<InventoryItem> readInventoryItems() {
         return invItemService.getInventoryItems();
     }
 
-    @RequestMapping(value="/inventoryitems/{invItemId}", method=RequestMethod.PUT)
+    @PutMapping("/{invItemId}")
     public InventoryItem readInventoryItem(@PathVariable(value = "invItemId") Long id, @RequestBody InventoryItem invItemDetails) {
         return invItemService.updateInventoryItem(id, invItemDetails);
     }
 
-    @RequestMapping(value="/inventoryitems/{invItemId}", method=RequestMethod.DELETE)
+    @DeleteMapping("/{invItemId}")
     public void deleteInventoryItem(@PathVariable(value = "invItemId") Long id) {
         invItemService.deleteInventoryItem(id);
     }
