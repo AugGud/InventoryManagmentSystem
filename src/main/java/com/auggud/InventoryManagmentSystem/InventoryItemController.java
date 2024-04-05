@@ -1,6 +1,8 @@
 package com.auggud.InventoryManagmentSystem;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/v1/inventory-items")
@@ -22,28 +25,57 @@ class IventoryItemController {
         this.invItemService = invItemService;
     }
 
+    // CREATE Inventory Item
+    // http://localhost:8080/api/v1/inventory-items
     @PostMapping
-    public InventoryItem createInventoryItem(@RequestBody InventoryItem invItem) {
-    return invItemService.createInventoryItem(invItem);
+    public ResponseEntity<InventoryItemDTO> createInventoryItem(@RequestBody InventoryItemDTO invItemDto, UriComponentsBuilder ucb){
+        InventoryItem savedInventoryItem = invItemService.createInventoryItem(invItemDto);
+        
+        URI locationOfNewInventoryItem = ucb
+            .path("api/v1/inventory-items/{id}")
+            .buildAndExpand(savedInventoryItem.getId())
+            .toUri();
+    
+        return ResponseEntity.created(locationOfNewInventoryItem).body(InventoryItemMapper.convertEntityToDto(savedInventoryItem));
     }
 
-    @GetMapping("/{requestedId}")
-    public ResponseEntity<InventoryItem> readInventoryItemById(@PathVariable Long requestedId) {
-        return invItemService.getById(requestedId);
+    // READ Inventory Item by id
+    // http://localhost:8080/api/v1/inventory-items/{requestedId}
+    @GetMapping("{requestedId}")
+    public ResponseEntity<InventoryItemDTO> getInventoryItemById(@PathVariable("id") Long invItemId){
+        Optional<InventoryItem> invItemOptional = invItemService.getInventoryItemById(invItemId);
+        if (invItemOptional.isPresent()) {
+            return ResponseEntity.ok(InventoryItemMapper.convertEntityToDto(invItemOptional.get()));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
+    // GET All Inventory Items
+    // http://localhost:8080/api/v1/inventory-items
     @GetMapping
-    public List<InventoryItem> readInventoryItems() {
-        return invItemService.getInventoryItems();
+    public ResponseEntity<List<InventoryItemDTO>> getAllInventoryItems() {
+        List<InventoryItemDTO> inventoryItems = invItemService.getAllInventoryItems();
+        return ResponseEntity.ok(inventoryItems);
     }
 
-    @PutMapping("/{invItemId}")
-    public InventoryItem readInventoryItem(@PathVariable(value = "invItemId") Long id, @RequestBody InventoryItem invItemDetails) {
-        return invItemService.updateInventoryItem(id, invItemDetails);
+    // UPDATE Inventory Item
+    // http://localhost:8080/api/v1/inventory-items/{requestedId}
+    @PutMapping("{id}")
+    public ResponseEntity<InventoryItemDTO> updateInventoryItem(@PathVariable("id") Long id, @RequestBody InventoryItemDTO inventoryItemDto) {
+        Optional<InventoryItemDTO> updatedInventoryItemDto = invItemService.updateInventoryItem(id, inventoryItemDto);
+        if (updatedInventoryItemDto.isPresent()) {
+            return ResponseEntity.ok(updatedInventoryItemDto.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @DeleteMapping("/{invItemId}")
-    public void deleteInventoryItem(@PathVariable(value = "invItemId") Long id) {
+    // DELETE
+    // http://localhost:8080/api/v1/inventory-items
+    @DeleteMapping("{requestedId}")
+    public ResponseEntity<Void> deleteInventoryItem(@PathVariable("id") Long id) {
         invItemService.deleteInventoryItem(id);
+        return ResponseEntity.noContent().build();
     }
 }
