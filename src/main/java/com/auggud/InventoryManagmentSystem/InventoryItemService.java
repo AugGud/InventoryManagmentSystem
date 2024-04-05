@@ -2,9 +2,9 @@ package com.auggud.InventoryManagmentSystem;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,39 +13,43 @@ public class InventoryItemService {
     @Autowired
     InventoryItemRepository invItemRepository;
 
-    // CREATE 
-    public InventoryItem createInventoryItem(InventoryItem invItem) {
+    // CREATE
+    public InventoryItem createInventoryItem(InventoryItemDTO invItemDto) {
+        InventoryItem invItem = InventoryItemMapper.convertDtoToEntity(invItemDto);
         return invItemRepository.save(invItem);
     }
 
-    // READ
-    public List<InventoryItem> getInventoryItems() {
-        return invItemRepository.findAll();
+    // READ by id
+    public Optional<InventoryItem> getInventoryItemById(Long requestedId) {
+        return invItemRepository.findById(requestedId);
     }
 
-    // READ by id
-    public ResponseEntity<InventoryItem> getById(Long requestedId) {
-        Optional<InventoryItem> invItemOptional = invItemRepository.findById(requestedId);
-        if (invItemOptional.isPresent()) {
-            return ResponseEntity.ok(invItemOptional.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-   }
-
-    // DELETE
-    public void deleteInventoryItem(Long invItemId) {
-        invItemRepository.deleteById(invItemId);
+    // READ all
+    public List<InventoryItemDTO> getAllInventoryItems() {
+        List<InventoryItem> inventoryItems = invItemRepository.findAll();
+        return inventoryItems.stream()
+                .map(InventoryItemMapper::convertEntityToDto)
+                .collect(Collectors.toList());
     }
 
     // UPDATE
-    public InventoryItem updateInventoryItem(Long invItemId, InventoryItem inventoryItemDetails) {
-        InventoryItem invItem = invItemRepository.findById(invItemId).get();
-        invItem.setName(inventoryItemDetails.getName());
-        invItem.setDescription(inventoryItemDetails.getDescription());
-        invItem.setQuantity(inventoryItemDetails.getQuantity());
-        invItem.setAmount(inventoryItemDetails.getAmount());
-        
-        return invItemRepository.save(invItem);                                
+    public Optional<InventoryItemDTO> updateInventoryItem(Long id, InventoryItemDTO inventoryItemDto) {
+        Optional<InventoryItem> inventoryItemOptional = invItemRepository.findById(id);
+        if (inventoryItemOptional.isPresent()) {
+            InventoryItem inventoryItem = inventoryItemOptional.get();
+            inventoryItem.setName(inventoryItemDto.getName());
+            inventoryItem.setDescription(inventoryItemDto.getDescription());
+            inventoryItem.setQuantity(inventoryItemDto.getQuantity());
+            inventoryItem.setAmount(inventoryItemDto.getAmount());
+            InventoryItem updatedInventoryItem = invItemRepository.save(inventoryItem);
+            return Optional.of(InventoryItemMapper.convertEntityToDto(updatedInventoryItem));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    // DELETE
+    public void deleteInventoryItem(Long id) {
+        invItemRepository.deleteById(id);
     }
 }
