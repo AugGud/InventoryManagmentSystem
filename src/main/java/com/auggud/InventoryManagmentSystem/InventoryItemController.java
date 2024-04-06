@@ -32,7 +32,7 @@ class IventoryItemController {
         InventoryItem savedInventoryItem = invItemService.createInventoryItem(invItemDto);
         
         URI locationOfNewInventoryItem = ucb
-            .path("api/v1/inventory-items/{id}")
+            .path("api/v1/inventory-items/{requestedId}")
             .buildAndExpand(savedInventoryItem.getId())
             .toUri();
     
@@ -42,7 +42,7 @@ class IventoryItemController {
     // READ Inventory Item by id
     // http://localhost:8080/api/v1/inventory-items/{requestedId}
     @GetMapping("{requestedId}")
-    public ResponseEntity<InventoryItemDTO> getInventoryItemById(@PathVariable("id") Long invItemId){
+    public ResponseEntity<InventoryItemDTO> getInventoryItemById(@PathVariable("requestedId") Long invItemId){
         Optional<InventoryItem> invItemOptional = invItemService.getInventoryItemById(invItemId);
         if (invItemOptional.isPresent()) {
             return ResponseEntity.ok(InventoryItemMapper.convertEntityToDto(invItemOptional.get()));
@@ -61,8 +61,8 @@ class IventoryItemController {
 
     // UPDATE Inventory Item
     // http://localhost:8080/api/v1/inventory-items/{requestedId}
-    @PutMapping("{id}")
-    public ResponseEntity<InventoryItemDTO> updateInventoryItem(@PathVariable("id") Long id, @RequestBody InventoryItemDTO inventoryItemDto) {
+    @PutMapping("{requestedId}")
+    public ResponseEntity<InventoryItemDTO> updateInventoryItem(@PathVariable("requestedId") Long id, @RequestBody InventoryItemDTO inventoryItemDto) {
         Optional<InventoryItemDTO> updatedInventoryItemDto = invItemService.updateInventoryItem(id, inventoryItemDto);
         if (updatedInventoryItemDto.isPresent()) {
             return ResponseEntity.ok(updatedInventoryItemDto.get());
@@ -74,7 +74,7 @@ class IventoryItemController {
     // DELETE
     // http://localhost:8080/api/v1/inventory-items
     @DeleteMapping("{requestedId}")
-    public ResponseEntity<Void> deleteInventoryItem(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteInventoryItem(@PathVariable("requestedId") Long id) {
         invItemService.deleteInventoryItem(id);
         return ResponseEntity.noContent().build();
     }
