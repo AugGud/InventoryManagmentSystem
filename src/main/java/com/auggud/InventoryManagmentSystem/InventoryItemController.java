@@ -1,11 +1,15 @@
 package com.auggud.InventoryManagmentSystem;
 
-import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,69 +17,58 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/inventory-items")
-class IventoryItemController {
+public class InventoryItemController {
+    private final InventoryItemService service;
 
-    private final InventoryItemService invItemService;
-
-    public IventoryItemController(InventoryItemService invItemService) {
-        this.invItemService = invItemService;
+    public InventoryItemController(InventoryItemService service) {
+        this.service = service;
     }
 
-    // CREATE Inventory Item
-    // http://localhost:8080/api/v1/inventory-items
     @PostMapping
-    public ResponseEntity<InventoryItemDTO> createInventoryItem(@RequestBody InventoryItemDTO invItemDto, UriComponentsBuilder ucb){
-        InventoryItem savedInventoryItem = invItemService.createInventoryItem(invItemDto);
-        
-        URI locationOfNewInventoryItem = ucb
-            .path("api/v1/inventory-items/{requestedId}")
-            .buildAndExpand(savedInventoryItem.getId())
-            .toUri();
-    
-        return ResponseEntity.created(locationOfNewInventoryItem).body(InventoryItemMapper.convertEntityToDto(savedInventoryItem));
+    public ResponseEntity<InventoryItemDTO> createInventoryItem(@Valid @RequestBody InventoryItemDTO dto) {
+        InventoryItemDTO createdItem = service.createInventoryItem(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
     }
 
-    // READ Inventory Item by id
-    // http://localhost:8080/api/v1/inventory-items/{requestedId}
-    @GetMapping("{requestedId}")
-    public ResponseEntity<InventoryItemDTO> getInventoryItemById(@PathVariable("requestedId") Long invItemId){
-        Optional<InventoryItem> invItemOptional = invItemService.getInventoryItemById(invItemId);
-        if (invItemOptional.isPresent()) {
-            return ResponseEntity.ok(InventoryItemMapper.convertEntityToDto(invItemOptional.get()));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<InventoryItemDTO> getInventoryItem(@PathVariable Long id) {
+        return service.getInventoryItemById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // GET All Inventory Items
-    // http://localhost:8080/api/v1/inventory-items
     @GetMapping
     public ResponseEntity<List<InventoryItemDTO>> getAllInventoryItems() {
-        List<InventoryItemDTO> inventoryItems = invItemService.getAllInventoryItems();
-        return ResponseEntity.ok(inventoryItems);
+        List<InventoryItemDTO> items = service.getAllInventoryItems();
+        return ResponseEntity.ok(items);
     }
 
-    // UPDATE Inventory Item
-    // http://localhost:8080/api/v1/inventory-items/{requestedId}
-    @PutMapping("{requestedId}")
-    public ResponseEntity<InventoryItemDTO> updateInventoryItem(@PathVariable("requestedId") Long id, @RequestBody InventoryItemDTO inventoryItemDto) {
-        Optional<InventoryItemDTO> updatedInventoryItemDto = invItemService.updateInventoryItem(id, inventoryItemDto);
-        if (updatedInventoryItemDto.isPresent()) {
-            return ResponseEntity.ok(updatedInventoryItemDto.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<InventoryItemDTO> updateInventoryItem(@PathVariable Long id, @Valid @RequestBody InventoryItemDTO dto) {
+        return service.updateInventoryItem(id, dto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE
-    // http://localhost:8080/api/v1/inventory-items
-    @DeleteMapping("{requestedId}")
-    public ResponseEntity<Void> deleteInventoryItem(@PathVariable("requestedId") Long id) {
-        invItemService.deleteInventoryItem(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInventoryItem(@PathVariable Long id) {
+        service.deleteInventoryItem(id);
         return ResponseEntity.noContent().build();
+    }
+
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return ResponseEntity.badRequest().body(errors);
     }
 }

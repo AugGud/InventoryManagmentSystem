@@ -2,39 +2,32 @@ package com.auggud.InventoryManagmentSystem;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "inventory_items")
-class InventoryItem {
+
+public class InventoryItem {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name="inv_item_id")
     private Long id;
 
-  @Column(name="name")
     private String name;
-  
-  @Column(name="description")
+
     private String description;
 
-  @Column(name="quantity")
     private int quantity;
 
-  @Column(name="amount")
-    private BigDecimal amount;
+    private BigDecimal price;
   
-  public InventoryItem(String name, String description, int quantity, BigDecimal amount) {
+  public InventoryItem(String name, String description, int quantity, BigDecimal price) {
     this.name = name;
     this.description = description;
     this.quantity = quantity;
-    this.amount = amount;
+    this.price = price;
   }
 
   public InventoryItem() {
@@ -72,17 +65,17 @@ class InventoryItem {
     this.quantity = quantity;
   }
 
-  public BigDecimal getAmount() {
-    return amount;
+  public BigDecimal getPrice() {
+    return price;
   }
 
-  public void setAmount(BigDecimal amount) {
-    this.amount = amount;
+  public void setPrice(BigDecimal price) {
+    this.price = price;
   }
 
   @Override
   public String toString() {
     return "InventoryItem [id=" + id + ", name=" + name + ", description=" + description + ", quantity=" + quantity
-        + ", amount=" + amount + "]";
+        + ", price=" + price + "]";
   }
 }
